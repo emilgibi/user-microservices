@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-app
+  namespace: dbnamespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-app
+  template:
+    metadata:
+      labels:
+        app: user-app
+    spec:
+      containers:
+      - name: user-app-1
+        image: user:1.0
+        env:
+          - name: DATABASE_HOST
+            value: postgres-service.database.svc.cluster.local
+          - name: DATABASE_PORT
+            value: "5432"
+          - name: DATABASE_NAME
+            value: mydatabase
+          - name: DATABASE_USER
+            value: postgres
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: my-password
+                key: password
