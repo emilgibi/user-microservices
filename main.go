@@ -21,6 +21,9 @@ func main() {
 	PASS := os.Getenv("PASS")
 
 	handlerObj.Connect(HOST, USER, PASS, "postgres", "5432")
+	handlerObj.ORDERSVC = os.Getenv("ORDER_SVC")
+	handlerObj.PRODUCTSVC = os.Getenv("PRODUCT_SVC")
+	handlerObj.STOCKSVC = os.Getenv("STOCK_SVC")
 
 	dbinstance, _ := handlerObj.DB.DB()
 	defer dbinstance.Close()

@@ -14,7 +14,10 @@ import (
 )
 
 type Handler struct {
-	DB *gorm.DB
+	DB         *gorm.DB
+	ORDERSVC   string
+	PRODUCTSVC string
+	STOCKSVC   string
 }
 
 func (handler *Handler) Connect(host, user, pass, dbName, port string) {
@@ -53,7 +56,7 @@ func (handler *Handler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	client := resty.New()
 	resp, _ := client.R().
 		SetHeader("Content-Type", "application/json").
-		Get("http://localhost:8081/products")
+		Get("http://" + handler.PRODUCTSVC + ":8081/products")
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp.Body())
@@ -64,7 +67,7 @@ func (handler *Handler) GetProductById(w http.ResponseWriter, r *http.Request) {
 	client := resty.New()
 	resp, _ := client.R().
 		SetHeader("Content-Type", "application/json").
-		Get("http://localhost:8081/products{product_id}")
+		Get("http://" + handler.PRODUCTSVC + ":8081/products{product_id}")
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp.Body())
@@ -74,7 +77,7 @@ func (handler *Handler) CheckStock(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
 	client := resty.New()
-	resp, err := client.R().SetResult(map[string]interface{}{}).Get("http://localhost:8082/stock/check/" + params["id"] + params["product_quantity"])
+	resp, err := client.R().SetResult(map[string]interface{}{}).Get("http://" + handler.STOCKSVC + ":8082/stock/check/" + params["id"] + params["product_quantity"])
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -99,7 +102,7 @@ func (handler *Handler) CheckStock(w http.ResponseWriter, r *http.Request) {
 		resp, err := client.R().
 			SetHeader("Content-Type", "application/json").
 			SetBody(`{"ID": 12345, "ProductName": "asdf", "OrderQuantity": 5}`).
-			Post("http://localhost:8084/order")
+			Post("http://" + handler.ORDERSVC + ":8084/order")
 
 		if err != nil {
 			log.Fatal(err)
